@@ -87,3 +87,15 @@ input {
 .gallery-screenshot {
   border-radius: 8px;
 }
+.even {
+  border-spacing:0;
+  border-color:transparent;
+  color:rgb(0, 0, 0);
+  background-color: #D2DFC3;
+}
+.odd {
+  border-spacing:0;
+  border-color:transparent;
+  color:rgb(0, 0, 0);
+  background-color: rgb(119, 151, 155);
+}

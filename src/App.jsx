@@ -2,12 +2,13 @@ import { useState } from "react";
 import "./App.css";
 import APIForm from "./components/APIForm";
 import Gallery from "./components/Gallery";
+import ResolutionResult from "./components/ResolutionResult";
 const ACCESS_KEY = import.meta.env.VITE_APP_ACCESS_KEY;
 
 const App = () => {
 	const [inputs, setInputs] = useState({
 		url: "",
-		format: "",
+		eidr_id: "",
 		no_ads: "",
 		no_cookie_banners: "",
 		width: "",
@@ -15,15 +16,14 @@ const App = () => {
 	});
 	const [currentImage, setCurrentImage] = useState(null);
 	const [prevImages, setPrevImages] = useState([]);
+	const [response, setResponse] = useState({});
 	const callAPI = async (query) => {
 		const response = await fetch(query);
 		const json = await response.json();
 		if (json.url === null) {
 			alert("Oops! Something went wrong with that query, let's try again!");
 		} else {
-			setCurrentImage(json.url);
-			setPrevImages((images) => [...images, json.url]);
-			reset();
+			setResponse(json);
 		}
 	};
 	const makeQuery = () => {
@@ -32,13 +32,13 @@ const App = () => {
 		let fail_on_status = "400%2C404%2C500-511";
 		let url_starter = "https://";
 		let fullURL = url_starter + inputs.url;
-		let query = `https://api.apiflash.com/v1/urltoimage?access_key=${ACCESS_KEY}&url=${fullURL}&format=${inputs.format}&width=${inputs.width}&height=${inputs.height}&no_cookie_banners=${inputs.no_cookie_banners}&no_ads=${inputs.no_ads}&wait_until=${wait_until}&response_type=${response_type}&fail_on_status=${fail_on_status}`;
+		let query = `https://cors-anywhere.herokuapp.com/https://proxy.eidr.org/resolve/${inputs.eidr_id}?type=Full&followAlias=false`;
 		callAPI(query).catch(console.error);
 	};
 	const reset = () => {
 		setInputs({
 			url: "",
-			format: "",
+			eidr_id: "",
 			no_ads: "",
 			no_cookie_banners: "",
 			width: "",
@@ -47,7 +47,7 @@ const App = () => {
 	};
 	const submitForm = () => {
 		let defaultValues = {
-			format: "jpeg",
+			eidr_id: "10.5240/301C-0DFA-B184-5448-BB3E-I",
 			no_ads: "true",
 			no_cookie_banners: "true",
 			width: "1920",
@@ -89,24 +89,7 @@ const App = () => {
 			)}
 			<br></br>
 			<div className='container'>
-				<h3> Current Query Status: </h3>
-				<p>
-					https://api.apiflash.com/v1/urltoimage?access_key=ACCESS_KEY
-					<br></br>
-					&url={inputs.url} <br></br>
-					&format={inputs.format} <br></br>
-					&width={inputs.width}
-					<br></br>
-					&height={inputs.height}
-					<br></br>
-					&no_cookie_banners={inputs.no_cookie_banners}
-					<br></br>
-					&no_ads={inputs.no_ads}
-					<br></br>
-				</p>
-			</div>
-			<div className='container'>
-				<Gallery images={prevImages} />
+				{response && <ResolutionResult response={response} />}
 			</div>
 			<br></br>
 		</div>
